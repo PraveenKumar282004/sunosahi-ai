@@ -1,0 +1,29 @@
+{
+  "name": "sunosahi-ai",
+  "version": "1.0.0",
+  "description": "SunoSahi AI - Confidence-Aware Multilingual Voice Agent for Gnani AI Hackathon",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "gnani-ai",
+    "voice-agent",
+    "stt",
+    "tts",
+    "prisma",
+    "timbre",
+    "multilingual",
+    "indic-ai"
+  ],
+  "author": "SunoSahi AI Team",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "multer": "^1.4.5-lts.1"
+  }
+}

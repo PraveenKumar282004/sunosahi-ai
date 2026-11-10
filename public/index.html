@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SunoSahi Dispatch — Field Service Voice Gateway</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            teal: {
+              50: '#F0FDFA',
+              100: '#CCFBF1',
+              200: '#99F6E4',
+              300: '#5EEAD4',
+              400: '#2DD4BF',
+              500: '#14B8A6',
+              600: '#0D9488',
+              700: '#0F766E',
+              800: '#115E59',
+              900: '#134E4A',
+              950: '#042F2E',
+            },
+            olive: {
+              50: '#F7FEE7',
+              100: '#ECFCCB',
+              200: '#D9F99D',
+              300: '#BEF264',
+              400: '#A3E635',
+              500: '#84CC16',
+              600: '#65A30D',
+              700: '#4D7C0F',
+              800: '#3F6212',
+              900: '#365314',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Google Fonts & Lucide Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-slate-100 dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
+
+  <!-- TOP ENTERPRISE APP HEADER (BALANCED DEEP CONTRAST) -->
+  <header class="bg-[#0F172A] dark:bg-[#080C14] border-b border-slate-800 text-white sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Logo & System Identifier -->
+      <div class="flex items-center space-x-3">
+        <div class="h-9 w-9 rounded-lg bg-teal-500/20 border border-teal-500/40 flex items-center justify-center text-teal-400">
+          <i data-lucide="radio" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="font-bold text-base tracking-tight text-white">SunoSahi</span>
+            <span class="text-[11px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-teal-900/80 text-teal-300 border border-teal-700/60 font-mono">
+              Voice Gateway
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-400 font-medium">Confidence-Aware Dispatch Engine for Field Services</p>
+        </div>
+      </div>
+
+      <!-- Real-time Controls & Status -->
+      <div class="flex items-center space-x-2.5">
+        
+        <!-- Automated Video Studio Button -->
+        <a href="video.html" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-teal-600 bg-teal-800 hover:bg-teal-700 text-xs text-white font-bold transition shadow-sm" title="Generate & Export Demo Video File">
+          <i data-lucide="video" class="w-3.5 h-3.5 text-teal-300"></i>
+          <span>Auto-Record Video</span>
+        </a>
+
+        <!-- Theme Mode Switcher -->
+        <button id="themeToggleBtn" class="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-xs text-slate-200 transition shadow-xs" title="Switch Theme">
+          <i data-lucide="moon" class="w-3.5 h-3.5 text-teal-400" id="themeIcon"></i>
+          <span class="text-xs font-semibold" id="themeText">Dark</span>
+        </button>
+
+        <!-- Ambient Street Noise Simulation Toggle -->
+        <button id="trafficNoiseToggle" class="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800/80 hover:bg-slate-800 text-xs text-slate-300 transition">
+          <i data-lucide="volume-2" class="w-3.5 h-3.5 text-teal-400" id="noiseIcon"></i>
+          <span>Acoustic Mode: <strong id="noiseStatusText" class="text-white font-medium">Clean Line</strong></span>
+        </button>
+
+        <!-- Gnani API Engine Status Pill -->
+        <button id="openSettingsBtn" class="flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-xs text-slate-200 transition">
+          <span class="relative flex h-2 w-2">
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-teal-400" id="statusDot"></span>
+          </span>
+          <span class="font-medium" id="statusLabel">Voice Engine Connected</span>
+          <i data-lucide="sliders-horizontal" class="w-3 h-3 text-slate-400"></i>
+        </button>
+
+        <!-- Reset Call Button -->
+        <button id="resetSessionBtn" class="p-2 rounded-lg border border-slate-700 bg-slate-800 hover:bg-red-950/60 hover:border-red-700 text-slate-300 hover:text-red-300 transition" title="Start New Inbound Call">
+          <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+        </button>
+
+      </div>
+
+    </div>
+  </header>
+
+  <!-- OPERATIONAL SUBHEADER STRIP -->
+  <div class="bg-slate-900 dark:bg-[#05080F] border-b border-slate-800/80 px-4 sm:px-6 lg:px-8 py-2 text-xs text-slate-400">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-4">
+        <span class="flex items-center gap-1.5 text-slate-300 font-medium">
+          <span class="h-2 w-2 rounded-full bg-emerald-500"></span> Live Inbound Queue: Line 01
+        </span>
+        <span class="hidden md:inline text-slate-500">|</span>
+        <span class="hidden md:inline font-mono text-[11px] text-slate-400">CALL-ID #NCR-98412</span>
+        <span class="hidden md:inline text-slate-500">|</span>
+        <span class="hidden md:inline text-slate-400">Caller: Ramesh Kumar (+91 98765-43210)</span>
+      </div>
+      <div class="flex items-center space-x-3 text-[11px] font-mono">
+        <span class="text-teal-400 font-semibold">STT: Prisma v3.0</span>
+        <span class="text-slate-600">•</span>
+        <span class="text-olive-400 font-semibold">TTS: Timbre Nalini</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN DUAL-PANE OPERATIONAL WORKSPACE -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+    <!-- LEFT COLUMN: LIVE CALL CONSOLE (7 COLS) -->
+    <section class="lg:col-span-7 flex flex-col space-y-4">
+      
+      <!-- Audio Ingestion & Canvas Card -->
+      <div class="bg-white dark:bg-[#131B2E] rounded-xl border border-slate-300 dark:border-slate-800 p-4 shadow-xs transition-colors">
+        
+        <div class="flex items-center justify-between mb-2.5">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="activity" class="w-4 h-4 text-teal-700 dark:text-teal-400"></i>
+            <span class="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide">Acoustic Spectrum Analyzer</span>
+          </div>
+          <div class="flex items-center space-x-2 text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+            <span id="visualizerMode">Acoustic Clarity: Optimal</span>
+            <span>•</span>
+            <span id="audioTimer">00:00</span>
+          </div>
+        </div>
+
+        <!-- Waveform Spectrum Canvas -->
+        <div class="relative bg-slate-900 rounded-lg p-2.5 border border-slate-800 overflow-hidden">
+          <canvas id="waveformCanvas" width="600" height="64" class="w-full h-14 block"></canvas>
+        </div>
+
+        <!-- Sample Inbound Call Recordings (Clean, Professional Presets) -->
+        <div class="mt-3.5 pt-3 border-t border-slate-200 dark:border-slate-800">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+              <i data-lucide="play-circle" class="w-3.5 h-3.5 text-teal-700 dark:text-teal-400"></i> Sample Inbound Call Recordings:
+            </span>
+            <span class="text-[11px] text-slate-400">Click to execute test turn</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            
+            <!-- Preset 1: AC Issue + Ambiguous Address -->
+            <button id="scenario1Btn" class="text-left p-2.5 rounded-lg border border-slate-300 dark:border-slate-700/80 bg-slate-50 dark:bg-slate-900/60 hover:bg-teal-50/70 dark:hover:bg-teal-950/40 hover:border-teal-400 dark:hover:border-teal-600 transition group">
+              <div class="flex items-center justify-between text-xs font-semibold text-slate-900 dark:text-slate-100 group-hover:text-teal-900 dark:group-hover:text-teal-300">
+                <span>Case 01: AC Fault (Vague Address)</span>
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-700 dark:group-hover:text-teal-400"></i>
+              </div>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1 italic font-normal">
+                "Bhaiya, AC mein problem hai... Address wohi purana hai"
+              </p>
+            </button>
+
+            <!-- Preset 2: Customer Clarification -->
+            <button id="scenario1ClarifyBtn" class="text-left p-2.5 rounded-lg border border-slate-300 dark:border-slate-700/80 bg-slate-50 dark:bg-slate-900/60 hover:bg-emerald-50/70 dark:hover:bg-emerald-950/40 hover:border-emerald-400 dark:hover:border-emerald-600 transition group">
+              <div class="flex items-center justify-between text-xs font-semibold text-slate-900 dark:text-slate-100 group-hover:text-emerald-900 dark:group-hover:text-emerald-300">
+                <span>Case 02: Disambiguated Response</span>
+                <i data-lucide="check" class="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-400"></i>
+              </div>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1 italic font-normal">
+                "Haan, Flat 402, Shanti Vihar, aur 6 baje bhej do"
+              </p>
+            </button>
+
+            <!-- Preset 3: Number Ambiguity -->
+            <button id="scenario2Btn" class="text-left p-2.5 rounded-lg border border-slate-300 dark:border-slate-700/80 bg-slate-50 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-400 dark:hover:border-slate-600 transition group">
+              <div class="flex items-center justify-between text-xs font-semibold text-slate-900 dark:text-slate-100">
+                <span>Case 03: Phonetic Conflict (15 vs 50)</span>
+                <i data-lucide="help-circle" class="w-3.5 h-3.5 text-slate-400"></i>
+              </div>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1 italic font-normal">
+                "Flat 15 mein aana... nahi sorry 50 tha shayad"
+              </p>
+            </button>
+
+            <!-- Preset 4: Mixed Dialect Motor Issue -->
+            <button id="scenario3Btn" class="text-left p-2.5 rounded-lg border border-slate-300 dark:border-slate-700/80 bg-slate-50 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-400 dark:hover:border-slate-600 transition group">
+              <div class="flex items-center justify-between text-xs font-semibold text-slate-900 dark:text-slate-100">
+                <span>Case 04: Motor Breakdown (Tanglish)</span>
+                <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-slate-400"></i>
+              </div>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1 italic font-normal">
+                "Motor restart panna mudiyala, smoke smell varudhu"
+              </p>
+            </button>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Dialogue Transcript Stream (Zendesk / Twilio Voice Style) -->
+      <div id="dialogueContainer" class="flex-1 min-h-[380px] max-h-[460px] overflow-y-auto space-y-3.5 p-4 rounded-xl border border-slate-300 dark:border-slate-800 bg-white dark:bg-[#090E17] shadow-xs scroll-smooth transition-colors">
+        
+        <!-- Welcome Dialogue Message -->
+        <div class="flex items-start space-x-3">
+          <div class="w-7 h-7 rounded-md bg-teal-100 dark:bg-teal-900/80 border border-teal-300 dark:border-teal-700 text-teal-800 dark:text-teal-200 flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-bold font-mono">
+            AI
+          </div>
+          <div class="bg-slate-50 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-xl p-3 max-w-[85%] text-slate-800 dark:text-slate-200">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs font-bold text-slate-900 dark:text-slate-100">SunoSahi Dispatch Assistant</span>
+              <span class="text-[10px] text-slate-500 font-mono">System Ready</span>
+            </div>
+            <p class="text-sm leading-relaxed text-slate-800 dark:text-slate-200">
+              Namaste! Service Helpline mein swagat hai. SunoSahi sun raha hai. Aapko electrician ya AC service mein kya issue aa raha hai?
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Live Voice Recording & Text Bar -->
+      <div class="bg-white dark:bg-[#131B2E] rounded-xl border border-slate-300 dark:border-slate-800 p-3.5 shadow-xs flex items-center justify-between gap-3 transition-colors">
+        
+        <!-- Mic Push to Talk -->
+        <div class="flex items-center space-x-3">
+          <button id="micBtn" class="h-12 w-12 rounded-xl bg-teal-700 hover:bg-teal-600 text-white flex items-center justify-center transition active:scale-95 shadow-sm">
+            <span id="micRing" class="hidden absolute inset-0 rounded-xl border-2 border-red-500 animate-ping"></span>
+            <i data-lucide="mic" class="w-5 h-5" id="micIcon"></i>
+          </button>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-sm text-slate-900 dark:text-slate-100" id="micLabel">Push to Talk</span>
+              <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold">
+                Mic Live
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400" id="micSubtitle">Captures Indic code-mixed speech in real-time</p>
+          </div>
+        </div>
+
+        <!-- Manual Query Input -->
+        <div class="flex-1 max-w-sm hidden sm:flex items-center space-x-2">
+          <input type="text" id="manualTextInput" placeholder="Type customer statement..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-teal-700 dark:focus:border-teal-500 transition">
+          <button id="manualSendBtn" class="p-2 rounded-lg bg-teal-700 hover:bg-teal-600 text-white transition" title="Submit utterance">
+            <i data-lucide="send" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- RIGHT COLUMN: DISPATCH OPERATIONS BOARD (5 COLS) -->
+    <section class="lg:col-span-5 flex flex-col space-y-4">
+      
+      <!-- Operational Tab Switcher -->
+      <div class="flex rounded-lg bg-slate-200/90 dark:bg-slate-800/80 p-1 border border-slate-300 dark:border-slate-700">
+        <button id="tabTicketBtn" class="flex-1 py-2 text-xs font-bold rounded-md bg-white dark:bg-[#131B2E] text-slate-900 dark:text-white shadow-xs transition flex items-center justify-center gap-1.5 border border-slate-200 dark:border-slate-700">
+          <i data-lucide="file-text" class="w-3.5 h-3.5 text-teal-700 dark:text-teal-400"></i> Dispatch Ticket
+        </button>
+        <button id="tabTechnicianBtn" class="flex-1 py-2 text-xs font-semibold rounded-md text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center justify-center gap-1.5">
+          <i data-lucide="user-check" class="w-3.5 h-3.5"></i> Technician Brief
+        </button>
+        <button id="tabConfidenceBtn" class="flex-1 py-2 text-xs font-semibold rounded-md text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center justify-center gap-1.5">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Accuracy Engine
+        </button>
+      </div>
+
+      <!-- TAB 1: STRUCTURED SERVICE TICKET -->
+      <div id="tabTicketContent" class="space-y-4">
+        
+        <div class="bg-white dark:bg-[#131B2E] rounded-xl border border-slate-300 dark:border-slate-800 p-5 shadow-xs transition-colors">
+          
+          <!-- Ticket Header Strip -->
+          <div class="flex items-center justify-between pb-3.5 border-b border-slate-200 dark:border-slate-800">
+            <div>
+              <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 font-mono">Order Tracking ID</span>
+              <h3 class="text-base font-bold text-slate-900 dark:text-slate-100 font-mono" id="ticketIdDisplay">
+                SSH-2026-9812
+              </h3>
+            </div>
+            <div id="ticketStatusPill" class="px-2.5 py-1 rounded text-xs font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-700/80 font-mono">
+              STATUS: CLARIFICATION PENDING
+            </div>
+          </div>
+
+          <!-- Structured Entity Checklist -->
+          <div class="mt-4 space-y-3">
+            
+            <!-- Fault Symptom -->
+            <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800">
+              <div class="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 mb-1">
+                <span class="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                  <i data-lucide="wrench" class="w-3.5 h-3.5 text-teal-700 dark:text-teal-400"></i> Fault Classification
+                </span>
+                <span id="issueConfidenceBadge" class="text-[10px] font-mono font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100/70 dark:bg-emerald-950/60 px-1.5 py-0.2 rounded border border-emerald-300 dark:border-emerald-700">
+                  96% Confidence
+                </span>
+              </div>
+              <p class="text-xs font-semibold text-slate-900 dark:text-slate-100" id="ticketIssueText">
+                AC cooling failure / No cooling since yesterday
+              </p>
+            </div>
+
+            <!-- Service Address & Disambiguation Flag -->
+            <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800" id="addressCard">
+              <div class="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 mb-1">
+                <span class="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                  <i data-lucide="map-pin" class="w-3.5 h-3.5 text-teal-700 dark:text-teal-400"></i> Destination Address
+                </span>
+                <span id="addressStatusBadge" class="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-amber-100 dark:bg-amber-950/80 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
+                  UNRESOLVED ("wohi purana")
+                </span>
+              </div>
+              <p class="text-xs font-medium text-slate-700 dark:text-slate-300" id="ticketAddressText">
+                Awaiting explicit flat / landmark confirmation...
+              </p>
+            </div>
+
+            <!-- Time Window -->
+            <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800">
+              <div class="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 mb-1">
+                <span class="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                  <i data-lucide="clock" class="w-3.5 h-3.5 text-teal-700 dark:text-teal-400"></i> Appointment Window
+                </span>
+                <span id="timeStatusBadge" class="text-[10px] font-mono text-slate-500 dark:text-slate-400 font-medium">
+                  Vague ("shaam ko")
+                </span>
+              </div>
+              <p class="text-xs font-medium text-slate-700 dark:text-slate-300" id="ticketTimeText">
+                Shaam ko (Suggested: 17:00 - 19:00 IST)
+              </p>
+            </div>
+
+          </div>
+
+          <!-- Field Operations ROI Metrics -->
+          <div class="mt-4 pt-3.5 border-t border-slate-200 dark:border-slate-800 grid grid-cols-2 gap-3 text-center">
+            <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800">
+              <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 block">Misdirected Trips Prevented</span>
+              <p class="text-lg font-bold text-slate-900 dark:text-slate-100 font-mono mt-0.5" id="hallucinationsCount">1</p>
+              <span class="text-[10px] text-slate-600 dark:text-slate-400">Zero false dispatches</span>
+            </div>
+            <div class="p-2.5 rounded-lg bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800">
+              <span class="text-[10px] uppercase font-bold tracking-wider text-teal-900 dark:text-teal-300 block">Estimated Transit Saved</span>
+              <p class="text-lg font-bold text-teal-950 dark:text-teal-200 font-mono mt-0.5">₹650</p>
+              <span class="text-[10px] text-teal-800 dark:text-teal-400">45 minutes technician time</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- TAB 2: MULTILINGUAL TECHNICIAN DISPATCH -->
+      <div id="tabTechnicianContent" class="space-y-4 hidden">
+        <div class="bg-white dark:bg-[#131B2E] rounded-xl border border-slate-300 dark:border-slate-800 p-5 shadow-xs transition-colors">
+          
+          <div class="flex items-center justify-between pb-3.5 border-b border-slate-200 dark:border-slate-800">
+            <div>
+              <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 font-mono">Field Crew Handoff</span>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-slate-100">Multilingual Dispatch Instructions</h3>
+            </div>
+            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700">
+              Gnani Timbre Active
+            </span>
+          </div>
+
+          <!-- Language Selector -->
+          <div class="mt-3.5">
+            <label class="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Technician Preferred Language:</label>
+            <div class="grid grid-cols-3 gap-1.5" id="technicianLangBtns">
+              <button data-lang="hindi" class="tech-lang-btn active py-1.5 px-2 rounded-md text-xs font-bold bg-teal-800 text-white transition">हिन्दी (Hindi)</button>
+              <button data-lang="english" class="tech-lang-btn py-1.5 px-2 rounded-md text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">English</button>
+              <button data-lang="tamil" class="tech-lang-btn py-1.5 px-2 rounded-md text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">தமிழ் (Tamil)</button>
+              <button data-lang="telugu" class="tech-lang-btn py-1.5 px-2 rounded-md text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">తెలుగు (Telugu)</button>
+              <button data-lang="kannada" class="tech-lang-btn py-1.5 px-2 rounded-md text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">ಕನ್ನಡ (Kannada)</button>
+              <button data-lang="marathi" class="tech-lang-btn py-1.5 px-2 rounded-md text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">मराठी (Marathi)</button>
+            </div>
+          </div>
+
+          <!-- Translated Instruction Box -->
+          <div class="mt-4 p-3.5 rounded-lg bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800">
+            <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-2">
+              <span class="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                <i data-lucide="file-text" class="w-3.5 h-3.5 text-teal-700 dark:text-teal-400"></i> Dispatch Note:
+              </span>
+              <span class="text-[10px] text-teal-800 dark:text-teal-300 font-mono font-bold bg-teal-100 dark:bg-teal-950/80 px-1.5 py-0.2 rounded" id="currentLangPill">हिन्दी</span>
+            </div>
+            <pre id="technicianSummaryText" class="text-xs text-slate-900 dark:text-slate-100 whitespace-pre-wrap font-sans leading-relaxed">
+शिकायत: AC में कूलिंग नहीं हो रही (कल से समस्या है)।
+पता: फ्लैट 402, शांति विहार।
+समय: शाम 6:00 PM - 7:00 PM।
+नोट: गैस लीकेज या कंप्रेसर कैपेसिटर चेक करने के टूल्स साथ रखें।
+            </pre>
+          </div>
+
+          <!-- Audio Dispatch Playback & WhatsApp Share -->
+          <div class="mt-4 flex items-center gap-2">
+            <button id="playTechnicianAudioBtn" class="flex-1 py-2.5 px-4 rounded-lg bg-teal-800 hover:bg-teal-700 text-white font-bold text-xs transition flex items-center justify-center gap-2 shadow-sm">
+              <i data-lucide="volume-2" class="w-4 h-4"></i>
+              <span id="playAudioLabel">Play Technician Voice Briefing</span>
+            </button>
+            <button id="copyWhatsAppBtn" class="py-2.5 px-3.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-xs border border-slate-300 dark:border-slate-700 transition flex items-center gap-1.5" title="Copy to WhatsApp">
+              <i data-lucide="send" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"></i>
+              <span>WhatsApp</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TAB 3: CONFIDENCE ANALYSIS & DISAMBIGUATION RADAR -->
+      <div id="tabConfidenceContent" class="space-y-4 hidden">
+        <div class="bg-white dark:bg-[#131B2E] rounded-xl border border-slate-300 dark:border-slate-800 p-5 shadow-xs transition-colors">
+          
+          <div class="flex items-center justify-between pb-3.5 border-b border-slate-200 dark:border-slate-800">
+            <div>
+              <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 font-mono">Decision Protocol</span>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-slate-100">Confidence Scoring Breakdown</h3>
+            </div>
+            <span class="text-xs font-mono font-bold text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-300 dark:border-slate-700" id="overallConfidenceScore">
+              Certainty: 72%
+            </span>
+          </div>
+
+          <!-- Metrics Breakdown -->
+          <div class="mt-4 space-y-3">
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-700 dark:text-slate-300 font-medium">Acoustic Clarity (Prisma SNR)</span>
+                <span class="text-teal-800 dark:text-teal-400 font-mono font-bold" id="acousticScoreText">92%</span>
+              </div>
+              <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2">
+                <div class="bg-teal-700 h-2 rounded-full transition-all duration-300" id="acousticBar" style="width: 92%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-700 dark:text-slate-300 font-medium">Entity Resolution Completeness</span>
+                <span class="text-olive-800 dark:text-olive-400 font-mono font-bold" id="completenessScoreText">50%</span>
+              </div>
+              <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2">
+                <div class="bg-olive-700 h-2 rounded-full transition-all duration-300" id="completenessBar" style="width: 50%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-700 dark:text-slate-300 font-medium">Ambiguity Penalty (Unresolved Referents)</span>
+                <span class="text-amber-800 dark:text-amber-400 font-mono font-bold" id="disambiguationPenaltyText">-45% (High Risk)</span>
+              </div>
+              <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2">
+                <div class="bg-amber-600 h-2 rounded-full transition-all duration-300" id="disambiguationBar" style="width: 45%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Enterprise Decision Principle -->
+          <div class="mt-4 p-3 rounded-lg bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 text-xs space-y-2">
+            <span class="font-bold text-slate-800 dark:text-slate-200 block">Dispatch Guardrail Logic:</span>
+            <div class="space-y-1.5 text-[11px] text-slate-600 dark:text-slate-400 leading-normal">
+              <p><strong>1. Threshold Gate:</strong> If aggregate certainty is below 85%, automated ticket dispatch is locked.</p>
+              <p><strong>2. Disambiguation Trigger:</strong> The engine issues a single polite clarifying question to resolve destination and timing ambiguity.</p>
+              <p><strong>3. Zero Hallucination Policy:</strong> The model never assumes unverified addresses or arbitrary time slots from historical CRM cache.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- SETTINGS MODAL -->
+  <div id="settingsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-[#131B2E] border border-slate-300 dark:border-slate-800 rounded-xl max-w-md w-full p-6 shadow-lg space-y-4 text-slate-900 dark:text-slate-100 transition-colors">
+      
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="sliders" class="w-4 h-4 text-teal-700 dark:text-teal-400"></i>
+          <h3 class="font-bold text-base text-slate-900 dark:text-slate-100">Voice Gateway Configuration</h3>
+        </div>
+        <button id="closeSettingsBtn" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- API Key Field -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+          Gnani / Vachana API Key (X-API-Key-ID):
+        </label>
+        <div class="relative">
+          <input type="password" id="gnaniApiKeyInput" placeholder="Paste your Gnani API Key..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-teal-700 dark:focus:border-teal-500 font-mono">
+          <button id="toggleKeyVisibility" class="absolute right-3 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs">
+            <i data-lucide="eye" class="w-4 h-4" id="eyeIcon"></i>
+          </button>
+        </div>
+        <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+          Direct endpoint integration with api.vachana.ai (Prisma STT + Timbre TTS).
+        </p>
+      </div>
+
+      <!-- Active Endpoints -->
+      <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs space-y-1 font-mono">
+        <div class="flex justify-between text-slate-600 dark:text-slate-400">
+          <span>STT:</span>
+          <span class="text-teal-800 dark:text-teal-300 font-bold">prisma-v3.0 (indic-auto)</span>
+        </div>
+        <div class="flex justify-between text-slate-600 dark:text-slate-400">
+          <span>TTS:</span>
+          <span class="text-olive-800 dark:text-olive-300 font-bold">timbre-v2.5 (Nalini)</span>
+        </div>
+        <div class="flex justify-between text-slate-600 dark:text-slate-400">
+          <span>Host:</span>
+          <span class="text-slate-800 dark:text-slate-200">api.vachana.ai</span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center space-x-2 pt-2">
+        <button id="testApiKeyBtn" class="flex-1 py-2 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-1.5">
+          <i data-lucide="activity" class="w-3.5 h-3.5"></i> Test Connection
+        </button>
+        <button id="saveApiKeyBtn" class="flex-1 py-2 px-3 rounded-lg bg-teal-800 hover:bg-teal-700 text-white text-xs font-bold transition flex items-center justify-center gap-1.5">
+          <i data-lucide="check" class="w-3.5 h-3.5"></i> Save Key
+        </button>
+      </div>
+
+      <!-- Feedback -->
+      <div id="settingsFeedback" class="text-xs p-2.5 rounded-lg hidden font-medium"></div>
+
+    </div>
+  </div>
+
+  <audio id="agentAudioPlayer" class="hidden"></audio>
+  <script src="app.js"></script>
+</body>
+</html>
